@@ -1,81 +1,59 @@
-const jwt = require("jsonwebtoken");
-const User = require("../models/User");
+const jwt = require('jsonwebtoken');
+const User = require('../models/User');
 
-exports.protect = async (req, res, next) => {
+exports.attachUser = async (req, res, next) => {
   try {
     const token = req.cookies.token;
 
     if (!token) {
-      return res.status(401).json({
-        success: false,
-        message: "Not authorized, no token",
-      });
+      req.user = null;
+      return next();
     }
 
     try {
       const decoded = jwt.verify(token, process.env.JWT_SECRET);
-      req.user = await User.findById(decoded.id).select("-passwordHash");
+      const user = await User.findById(decoded.id);
 
-      if (!req.user) {
-        return res.status(401).json({
-          success: false,
-          message: "Not authorized, user not found",
-        });
-      }
-
-      next();
+      req.user = user || null;
+      return next();
     } catch (error) {
-      return res.status(401).json({
-        success: false,
-        message: "Not authorized, token failed",
-      });
+      req.user = null; // invalid or expired token
+      return next();
     }
   } catch (error) {
-    console.log(error);
-    res.status(500).json({
-      success: false,
-      message: "Internal server error",
-    });
+    console.error('Error in attachUser middleware:', error);
+    req.user = null;
+    next();
   }
 };
 
-exports.guest = async (req, res, next) => {
-  try {
-    const token = req.cookies.token;
-
-    if (token) {
-      try {
-        const decoded = jwt.verify(token, process.env.JWT_SECRET);
-        const user = await User.findById(decoded.id).select("-passwordHash");
-
-        if (user) {
-          return res.status(403).json({
-            success: false,
-            message: "Already authenticated, guests only",
-          });
-        }
-      } catch (error) {
-        // Token is invalid/expired, allow to proceed as guest
-      }
-    }
-
-    next();
-  } catch (error) {
-    console.error("Error in guest middleware:", error);
-    res.status(500).json({
+exports.protect = (req, res, next) => {
+  if (!req.user) {
+    return res.status(401).json({
       success: false,
-      message: "Internal server error",
+      message: 'Not authorized',
     });
   }
+  next();
+};
+
+exports.guest = (req, res, next) => {
+  if (req.user) {
+    return res.status(403).json({
+      success: false,
+      message: 'Already authenticated, guests only',
+    });
+  }
+  next();
 };
 
 exports.admin = (req, res, next) => {
-  if (req.user && req.user.role === "admin") {
-    next();
-  } else {
-    res.status(403).json({
-      success: false,
-      message: "Not authorized as admin",
-    });
+  if (req.user && req.user.role === 'admin') {
+    return next();
   }
+
+  return res.status(403).json({
+    success: false,
+    message: 'Not authorized as admin',
+  });
 };

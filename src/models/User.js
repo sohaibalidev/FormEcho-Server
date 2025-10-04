@@ -1,29 +1,35 @@
-const mongoose = require("mongoose");
-const bcrypt = require("bcryptjs");
+const mongoose = require('mongoose');
 
 const userSchema = new mongoose.Schema(
   {
+    googleId: {
+      type: String,
+      required: true,
+      unique: true,
+    },
     email: {
       type: String,
-      required: [true, "Email is required"],
+      required: [true, 'Email is required'],
       unique: true,
       lowercase: true,
       validate: {
         validator: function (email) {
-          return /^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,3})+$/.test(email);
+          return /^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,})+$/.test(email);
         },
-        message: "Please enter a valid email",
+        message: 'Please enter a valid email',
       },
     },
-    passwordHash: {
+    name: {
       type: String,
-      required: [true, "Password is required"],
-      minlength: 6,
+      required: true,
+    },
+    picture: {
+      type: String,
     },
     role: {
       type: String,
-      enum: ["user", "admin"],
-      default: "user",
+      enum: ['user', 'admin'],
+      default: 'user',
     },
     paidStatus: {
       type: Boolean,
@@ -63,7 +69,6 @@ const userSchema = new mongoose.Schema(
   }
 );
 
-// Reset current month API calls at the start of each month
 userSchema.methods.resetMonthlyUsage = function () {
   const now = new Date();
   const lastReset = new Date(this.lastApiCallReset);
@@ -78,8 +83,4 @@ userSchema.methods.resetMonthlyUsage = function () {
   }
 };
 
-userSchema.methods.matchPassword = async function (password) {
-  return await bcrypt.compare(password, this.passwordHash);
-};
-
-module.exports = mongoose.model("User", userSchema);
+module.exports = mongoose.model('User', userSchema);
