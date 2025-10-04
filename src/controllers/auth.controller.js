@@ -5,11 +5,6 @@ const config = require('../config/app.config');
 
 const client = new OAuth2Client(config.GOOGLE_CLIENT_ID);
 
-exports.getMe = async (req, res) => {
-  const { _id, name, email, picture, role } = req.user;
-  res.json({ success: true, user: { id: _id, name, email, picture, role } });
-};
-
 async function verifyGoogleToken(idToken) {
   const ticket = await client.verifyIdToken({
     idToken,
@@ -17,6 +12,14 @@ async function verifyGoogleToken(idToken) {
   });
   return ticket.getPayload();
 }
+
+exports.getMe = async (req, res) => {
+  const { _id, name, email, picture, role, tier } = req.user;
+  res.json({
+    success: true,
+    user: { id: _id, name, email, picture, role, tier },
+  });
+};
 
 exports.googleLogin = async (req, res) => {
   try {
@@ -48,6 +51,7 @@ exports.googleLogin = async (req, res) => {
         email: payload.email,
         name: payload.name,
         picture: payload.picture,
+        tier: 'free',
         role,
       });
     } else {

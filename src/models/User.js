@@ -31,37 +31,18 @@ const userSchema = new mongoose.Schema(
       enum: ['user', 'admin'],
       default: 'user',
     },
-    paidStatus: {
-      type: Boolean,
-      default: false,
+    tier: {
+      type: String,
+      enum: ['free', 'pro', 'enterprise'],
+      default: 'free',
     },
     joinedOn: {
       type: Date,
       default: Date.now,
     },
-    nextPaymentDate: {
-      type: Date,
-      default: function () {
-        const date = new Date(this.joinedOn);
-        date.setMonth(date.getMonth() + 1);
-        return date;
-      },
-    },
     isActive: {
       type: Boolean,
       default: true,
-    },
-    totalApiCalls: {
-      type: Number,
-      default: 0,
-    },
-    currentMonthApiCalls: {
-      type: Number,
-      default: 0,
-    },
-    lastApiCallReset: {
-      type: Date,
-      default: Date.now,
     },
   },
   {
@@ -69,16 +50,12 @@ const userSchema = new mongoose.Schema(
   }
 );
 
-userSchema.methods.resetMonthlyUsage = function () {
-  const now = new Date();
-  const lastReset = new Date(this.lastApiCallReset);
+userSchema.methods.updateTier = async function (tierName) {
+  const Tier = mongoose.model('Tier');
+  const tierData = await Tier.findOne({ name: tierName });
 
-  if (
-    now.getMonth() !== lastReset.getMonth() ||
-    now.getFullYear() !== lastReset.getFullYear()
-  ) {
-    this.currentMonthApiCalls = 0;
-    this.lastApiCallReset = now;
+  if (tierData) {
+    this.tier = tierName;
     return this.save();
   }
 };

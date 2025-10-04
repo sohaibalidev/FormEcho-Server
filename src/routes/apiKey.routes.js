@@ -1,19 +1,19 @@
 const express = require('express');
-const {
-  getAPIKey,
-  createAPIKey,
-  updateAPIKey,
-  getAPIKeyUsage,
-} = require('../controllers/apiKey.controller');
-
+const router = express.Router(); // <--- this was missing
 const { protect } = require('../middleware/auth.middleware');
-
-const router = express.Router();
+const apikeyController = require('../controllers/apiKey.controller');
 
 router.use(protect);
 
-router.route('/').get(getAPIKey).post(createAPIKey).put(updateAPIKey);
+router.get('/stats', apikeyController.getStats);
 
-router.get('/usage', getAPIKeyUsage);
+router
+  .route('/keys')
+  .get(apikeyController.getAPIKeys)
+  .post(apikeyController.createAPIKey);
+
+router.put('/keys/:id', apikeyController.updateAPIKey);
+
+router.put('/tier', apikeyController.updateUserTier);
 
 module.exports = router;

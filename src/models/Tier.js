@@ -1,18 +1,18 @@
-const mongoose = require("mongoose");
+const mongoose = require('mongoose');
 
 const tierSchema = new mongoose.Schema(
   {
     name: {
       type: String,
-      enum: ["free", "pro", "enterprise"],
+      enum: ['free', 'pro', 'enterprise'],
       required: true,
       unique: true,
     },
-    requestsPerMonth: {
+    calls: {
       type: Number,
-      required: true,
+      default: 0,
     },
-    emailsPerMonth: {
+    callsPerMonth: {
       type: Number,
       required: true,
     },
@@ -21,58 +21,43 @@ const tierSchema = new mongoose.Schema(
         type: String,
       },
     ],
-    price: {
-      type: Number,
-      default: 0,
-    },
-    isActive: {
-      type: Boolean,
-      default: true,
-    },
   },
   {
     timestamps: true,
   }
 );
 
-// Pre-save to create default tiers
 tierSchema.statics.initializeTiers = async function () {
   const tiers = [
     {
-      name: "free",
-      requestsPerMonth: 100,
-      emailsPerMonth: 50,
+      name: 'free',
+      callsPerMonth: 100,
       features: [
-        "Basic Form Handling",
-        "Email Notifications",
-        "30-day History",
+        'Basic Form Handling',
+        'Email Notifications',
+        '30-day History',
       ],
-      price: 0,
     },
     {
-      name: "pro",
-      requestsPerMonth: 1000,
-      emailsPerMonth: 500,
+      name: 'pro',
+      callsPerMonth: 1000,
       features: [
-        "Advanced Form Handling",
-        "Priority Support",
-        "Webhook Support",
-        "90-day History",
+        'Advanced Form Handling',
+        'Priority Support',
+        'Webhook Support',
+        '90-day History',
       ],
-      price: 19,
     },
     {
-      name: "enterprise",
-      requestsPerMonth: 10000,
-      emailsPerMonth: 5000,
+      name: 'enterprise',
+      callsPerMonth: 10000,
       features: [
-        "Unlimited Forms",
-        "Custom Domains",
-        "API Access",
-        "Dedicated Support",
-        "1-year History",
+        'Unlimited Forms',
+        'Custom Domains',
+        'API Access',
+        'Dedicated Support',
+        '1-year History',
       ],
-      price: 99,
     },
   ];
 
@@ -84,4 +69,4 @@ tierSchema.statics.initializeTiers = async function () {
   }
 };
 
-module.exports = mongoose.model("Tier", tierSchema);
+module.exports = mongoose.model('Tier', tierSchema);
