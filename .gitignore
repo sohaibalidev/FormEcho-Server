@@ -20,6 +20,5 @@ logs/*.log
 Thumbs.db
 
 # Build artifacts
-dist/
 build/
 .cache/
