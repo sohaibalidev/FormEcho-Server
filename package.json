@@ -1,0 +1,45 @@
+{
+  "name": "formecho-backend",
+  "version": "1.0.0",
+  "private": true,
+  "description": "FormEcho Backend — The server-side API for FormEcho, a form-handling and API key–driven SaaS platform built with Express and MongoDB.",
+  "main": "index.js",
+  "scripts": {
+    "dev": "nodemon index.js",
+    "start": "node index.js",
+    "upload": "git diff --quiet && git diff --cached --quiet && echo 'No changes to commit' || (git add . && git commit -m \"auto-update\" && git push origin main)",
+    "download": "git fetch origin && git reset --hard origin/main && git clean -fd && echo 'Project updated from GitHub'"
+  },
+  "keywords": [
+    "FormEcho",
+    "Backend",
+    "API",
+    "SaaS",
+    "Form Handling",
+    "API Keys",
+    "MongoDB",
+    "Express",
+    "Authentication",
+    "REST"
+  ],
+  "author": "Sohaib <msohaibaliofficial@gmail.com>",
+  "license": "MIT",
+  "dependencies": {
+    "bcryptjs": "^2.4.3",
+    "cookie": "^1.0.2",
+    "cookie-parser": "^1.4.7",
+    "cors": "^2.8.5",
+    "dotenv": "^16.3.1",
+    "express": "^4.18.2",
+    "express-rate-limit": "^6.10.0",
+    "helmet": "^7.0.0",
+    "jsonwebtoken": "^9.0.2",
+    "mongoose": "^7.5.0",
+    "nodemailer": "^6.9.4",
+    "uuid": "^9.0.0",
+    "validator": "^13.11.0"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.1"
+  }
+}
