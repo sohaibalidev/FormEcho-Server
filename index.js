@@ -8,7 +8,8 @@
 * * Initialize default tiers
 * * Start listening on configured port
     */
-
+   
+require("module-alias/register");
 const http = require("http");
 const app = require("./src/app");
 const { connectDB } = require("./src/config/db.config");
